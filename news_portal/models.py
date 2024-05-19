@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.urls import resolve
 
 
 article = 'AR'
@@ -16,6 +17,9 @@ class Author(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     rating = models.IntegerField(default=0)
 
+    def __str__(self):
+        return f'{self.user.username}'
+
     def update_rating(self):
         post_ratings = self.posts.all().aggregate(models.Sum('rating'))['rating__sum'] * 3
         comment_ratings = self.user.comment_set.all().aggregate(models.Sum('rating'))['rating__sum']
@@ -28,6 +32,9 @@ class Author(models.Model):
 class Category(models.Model):
     category_name = models.CharField(unique=True, max_length=255)
 
+    def __str__(self):
+        return f'{self.category_name}'
+
 
 class Post(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='posts')
@@ -37,6 +44,7 @@ class Post(models.Model):
     title = models.CharField(max_length=255)
     text = models.TextField()
     rating = models.IntegerField(default=0)
+
 
     def __str__(self):
         return f'{self.title}: {self.text[:20]}'
